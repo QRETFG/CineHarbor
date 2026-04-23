@@ -22,7 +22,10 @@ export function createMoviesRouter({ rootDir }: MoviesRouterOptions = {}) {
   });
 
   router.get("/:id", (req, res) => {
-    const movie = getMovieById({ rootDir, id: req.params.id });
+    const movieId = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+    const movie = getMovieById({ rootDir, id: movieId });
 
     if (!movie) {
       res.status(404).json({ message: "Movie not found" });
@@ -38,12 +41,18 @@ export function createMoviesRouter({ rootDir }: MoviesRouterOptions = {}) {
   });
 
   router.put("/:id", requireAdmin, (req, res) => {
-    const movie = saveMovie({ rootDir, id: Number(req.params.id), ...req.body });
+    const movieId = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+    const movie = saveMovie({ rootDir, id: Number(movieId), ...req.body });
     res.json(movie);
   });
 
   router.delete("/:id", requireAdmin, (req, res) => {
-    const deleted = deleteMovie({ rootDir, id: req.params.id });
+    const movieId = Array.isArray(req.params.id)
+      ? req.params.id[0]
+      : req.params.id;
+    const deleted = deleteMovie({ rootDir, id: movieId });
 
     if (!deleted) {
       res.status(404).json({ message: "Movie not found" });
