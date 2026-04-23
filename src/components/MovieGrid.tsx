@@ -1,4 +1,4 @@
-import type { Movie } from "../data/movies";
+import type { Movie } from "../types/catalog";
 import MovieCard from "./MovieCard";
 
 const rotations = [
@@ -19,14 +19,17 @@ export default function MovieGrid({
   sectionId,
 }: MovieGridProps) {
   return (
-    <section id={sectionId} className="max-w-6xl mx-auto px-4 mt-12">
+    <section
+      id={sectionId}
+      className="max-w-6xl mx-auto px-4 mt-12 scroll-mt-20"
+    >
       <h2 className="font-hand text-2xl font-bold mb-6 flex items-center gap-2">
         <span className="inline-block w-8 h-0.5 bg-pencil" />
         {title}
         <span className="inline-block w-8 h-0.5 bg-pencil" />
       </h2>
       {movies.length === 0 ? (
-        <div className="sketch-border bg-white p-8 text-center font-body text-pencil/60">
+        <div className="sketch-border bg-surface p-8 text-center font-body text-pencil/60">
           暂无内容，换个关键词再试试。
         </div>
       ) : (

@@ -1,5 +1,5 @@
 import { Star } from "lucide-react";
-import type { Movie } from "../data/movies";
+import type { Movie } from "../types/catalog";
 
 interface MovieCardProps {
   movie: Movie;
@@ -14,7 +14,7 @@ export default function MovieCard({ movie, rotation }: MovieCardProps) {
       rel="noreferrer"
       aria-label={`打开《${movie.title}》链接`}
       style={{ transform: `rotate(${rotation})` }}
-      className="sketch-card sketch-border bg-white shadow-sketch overflow-hidden cursor-pointer"
+      className="sketch-card sketch-border bg-surface shadow-sketch overflow-hidden cursor-pointer"
     >
       <div className="relative">
         <img

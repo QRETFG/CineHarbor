@@ -7,10 +7,13 @@ import MovieGrid from "./components/MovieGrid";
 import WebsiteTags from "./components/WebsiteTags";
 import Footer from "./components/Footer";
 import { Sparkles } from "lucide-react";
-import { popularMovies, recommendedMovies } from "./data/movies";
+import { useMovieSection } from "./hooks/useMovieSection";
 
 export default function App() {
   const [search, setSearch] = useState("");
+  const { items: featuredMovies } = useMovieSection("featured");
+  const { items: popularMovies } = useMovieSection("popular");
+  const { items: recommendedMovies } = useMovieSection("recommended");
 
   const filtered = useMemo(() => {
     if (!search.trim()) return popularMovies;
@@ -25,7 +28,7 @@ export default function App() {
   return (
     <div className="min-h-screen">
       <Navbar />
-      <Hero />
+      <Hero movies={featuredMovies} />
       <WebsiteTags />
       <SearchBar value={search} onChange={setSearch} />
       <MovieGrid movies={filtered} />
