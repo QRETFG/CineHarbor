@@ -11,6 +11,7 @@ export interface Movie {
   status?: string;
   posterAssetId?: number | null;
   backdropAssetId?: number | null;
+  sections?: MovieSectionKey[];
 }
 
 export interface SharedWebsite {

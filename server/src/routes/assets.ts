@@ -13,6 +13,8 @@ interface AssetsRouterOptions {
   rootDir?: string;
 }
 
+const MAX_ASSET_UPLOAD_BYTES = 25 * 1024 * 1024;
+
 function isAssetKind(value: string): value is AssetKind {
   return value === "poster" || value === "backdrop" || value === "site_asset";
 }
@@ -39,7 +41,7 @@ export function createAssetsRouter({ rootDir }: AssetsRouterOptions = {}) {
   const upload = multer({
     storage,
     limits: {
-      fileSize: 5 * 1024 * 1024,
+      fileSize: MAX_ASSET_UPLOAD_BYTES,
     },
     fileFilter(req, file, callback) {
       const kind = req.body.kind;

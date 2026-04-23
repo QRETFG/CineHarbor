@@ -36,3 +36,23 @@ test("uploads a poster asset and returns metadata", async () => {
   expect(response.body.kind).toBe("poster");
   expect(response.body.publicUrl).toMatch(/\/uploads\/posters\//);
 });
+
+test("uploads a larger site asset and returns metadata", async () => {
+  const agent = request.agent(createApp({ rootDir }));
+
+  await agent
+    .post("/api/auth/login")
+    .send({ username: "admin", password: "secret123" });
+
+  const response = await agent
+    .post("/api/assets")
+    .field("kind", "site_asset")
+    .attach("file", Buffer.alloc(6 * 1024 * 1024, "a"), {
+      filename: "site-bundle.zip",
+      contentType: "application/zip",
+    });
+
+  expect(response.status).toBe(201);
+  expect(response.body.kind).toBe("site_asset");
+  expect(response.body.publicUrl).toMatch(/\/uploads\/site-assets\//);
+});

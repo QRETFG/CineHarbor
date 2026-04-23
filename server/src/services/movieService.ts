@@ -1,6 +1,8 @@
 import { createConfig } from "../config";
 import { createDatabase } from "../db/connection";
 
+type MovieSectionKey = "featured" | "popular" | "recommended";
+
 interface MovieContext {
   rootDir?: string;
 }
@@ -38,7 +40,41 @@ function mapMovie(row: Record<string, unknown>) {
     posterAssetId: row.poster_asset_id,
     backdropAssetId: row.backdrop_asset_id,
     status: row.status,
+    sections: [] as MovieSectionKey[],
   };
+}
+
+function listSectionsByMovieId(
+  rootDir: string | undefined,
+  movieIds: number[]
+): Map<number, MovieSectionKey[]> {
+  const sectionsByMovieId = new Map<number, MovieSectionKey[]>();
+
+  if (movieIds.length === 0) {
+    return sectionsByMovieId;
+  }
+
+  const db = createDatabase(createConfig({ rootDir }));
+  const placeholders = movieIds.map(() => "?").join(", ");
+  const rows = db
+    .prepare(
+      `
+        SELECT movie_id, section_key
+        FROM movie_sections
+        WHERE movie_id IN (${placeholders})
+        ORDER BY sort_order ASC, id ASC
+      `
+    )
+    .all(...movieIds) as Array<{ movie_id: number; section_key: MovieSectionKey }>;
+  db.close();
+
+  for (const row of rows) {
+    const sections = sectionsByMovieId.get(row.movie_id) ?? [];
+    sections.push(row.section_key);
+    sectionsByMovieId.set(row.movie_id, sections);
+  }
+
+  return sectionsByMovieId;
 }
 
 export function listMovies({
@@ -48,16 +84,25 @@ export function listMovies({
 }: MovieContext & { status?: string; section?: string }) {
   const db = createDatabase(createConfig({ rootDir }));
   const clauses: string[] = [];
-  const params: Array<string | number> = [];
+  const joins: string[] = [
+    "LEFT JOIN assets AS poster_asset ON poster_asset.id = movies.poster_asset_id",
+    "LEFT JOIN assets AS backdrop_asset ON backdrop_asset.id = movies.backdrop_asset_id",
+  ];
+  const joinParams: Array<string | number> = [];
+  const whereParams: Array<string | number> = [];
+  let orderBy = "movies.id ASC";
+
+  if (section) {
+    joins.push(
+      "INNER JOIN movie_sections AS section_filter ON section_filter.movie_id = movies.id AND section_filter.section_key = ?"
+    );
+    joinParams.push(section);
+    orderBy = "COALESCE(section_filter.sort_order, 0) ASC, movies.id ASC";
+  }
 
   if (status) {
     clauses.push("movies.status = ?");
-    params.push(status);
-  }
-
-  if (section) {
-    clauses.push("movie_sections.section_key = ?");
-    params.push(section);
+    whereParams.push(status);
   }
 
   const where = clauses.length ? `WHERE ${clauses.join(" AND ")}` : "";
@@ -69,17 +114,24 @@ export function listMovies({
           poster_asset.public_url AS poster_url,
           backdrop_asset.public_url AS backdrop_url
         FROM movies
-        LEFT JOIN movie_sections ON movie_sections.movie_id = movies.id
-        LEFT JOIN assets AS poster_asset ON poster_asset.id = movies.poster_asset_id
-        LEFT JOIN assets AS backdrop_asset ON backdrop_asset.id = movies.backdrop_asset_id
+        ${joins.join("\n")}
         ${where}
-        ORDER BY COALESCE(movie_sections.sort_order, 0) ASC, movies.id ASC
+        ORDER BY ${orderBy}
       `
     )
-    .all(...params) as Record<string, unknown>[];
+    .all(...joinParams, ...whereParams) as Record<string, unknown>[];
   db.close();
 
-  return rows.map(mapMovie);
+  const movies = rows.map(mapMovie);
+  const sectionsByMovieId = listSectionsByMovieId(
+    rootDir,
+    movies.map((movie) => Number(movie.id))
+  );
+
+  return movies.map((movie) => ({
+    ...movie,
+    sections: sectionsByMovieId.get(Number(movie.id)) ?? [],
+  }));
 }
 
 export function getMovieById({
@@ -103,7 +155,17 @@ export function getMovieById({
     .get(id) as Record<string, unknown> | undefined;
   db.close();
 
-  return row ? mapMovie(row) : null;
+  if (!row) {
+    return null;
+  }
+
+  const movie = mapMovie(row);
+  const sectionsByMovieId = listSectionsByMovieId(rootDir, [Number(movie.id)]);
+
+  return {
+    ...movie,
+    sections: sectionsByMovieId.get(Number(movie.id)) ?? [],
+  };
 }
 
 function replaceSections(

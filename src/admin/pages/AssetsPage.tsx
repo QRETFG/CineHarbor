@@ -41,6 +41,11 @@ export default function AssetsPage() {
         label="上传海报素材"
         onUploaded={() => void loadAssets()}
       />
+      <AssetUploadForm
+        kind="backdrop"
+        label="上传背景素材"
+        onUploaded={() => void loadAssets()}
+      />
 
       <section className="sketch-border bg-surface p-5 shadow-sketch">
         <h2 className="font-hand text-2xl font-bold">已有素材</h2>
@@ -54,6 +59,7 @@ export default function AssetsPage() {
                 className="sketch-border-thin bg-paper px-4 py-3"
               >
                 <div className="font-body font-semibold">{asset.originalName}</div>
+                <div className="font-body text-sm text-pencil/60">{asset.kind}</div>
                 <div className="font-body text-sm text-pencil/60">{asset.publicUrl}</div>
               </article>
             ))

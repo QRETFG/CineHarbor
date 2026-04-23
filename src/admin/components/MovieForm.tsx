@@ -1,4 +1,4 @@
-import type { Movie } from "../../types/catalog";
+import type { Movie, MovieSectionKey } from "../../types/catalog";
 
 interface AssetOption {
   id: number;
@@ -16,6 +16,7 @@ export interface MovieFormValues {
   status: string;
   posterAssetId: string;
   backdropAssetId: string;
+  sections: MovieSectionKey[];
 }
 
 interface MovieFormProps {
@@ -27,6 +28,12 @@ interface MovieFormProps {
   editingMovie?: Movie | null;
 }
 
+const sectionOptions: Array<{ label: string; value: MovieSectionKey }> = [
+  { label: "精选轮播", value: "featured" },
+  { label: "热门列表", value: "popular" },
+  { label: "推荐区", value: "recommended" },
+];
+
 export default function MovieForm({
   assets,
   values,
@@ -35,6 +42,14 @@ export default function MovieForm({
   submitLabel = "保存影视",
   editingMovie,
 }: MovieFormProps) {
+  function toggleSection(section: MovieSectionKey) {
+    const nextSections = values.sections.includes(section)
+      ? values.sections.filter((value) => value !== section)
+      : [...values.sections, section];
+
+    onChange({ ...values, sections: nextSections });
+  }
+
   return (
     <section className="sketch-border bg-surface p-5 shadow-sketch">
       <h2 className="font-hand text-2xl font-bold">
@@ -103,6 +118,34 @@ export default function MovieForm({
             onChange={(event) => onChange({ ...values, url: event.target.value })}
           />
         </label>
+
+        <label className="font-body text-sm">
+          <span className="mb-2 block font-semibold">发布状态</span>
+          <select
+            className="w-full sketch-border-thin bg-paper px-3 py-2"
+            value={values.status}
+            onChange={(event) => onChange({ ...values, status: event.target.value })}
+          >
+            <option value="draft">草稿</option>
+            <option value="published">已发布</option>
+          </select>
+        </label>
+
+        <fieldset className="font-body text-sm">
+          <legend className="mb-2 block font-semibold">首页区块</legend>
+          <div className="space-y-2">
+            {sectionOptions.map((section) => (
+              <label key={section.value} className="flex items-center gap-2">
+                <input
+                  checked={values.sections.includes(section.value)}
+                  onChange={() => toggleSection(section.value)}
+                  type="checkbox"
+                />
+                <span>{section.label}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
         <label className="font-body text-sm">
           <span className="mb-2 block font-semibold">海报素材</span>

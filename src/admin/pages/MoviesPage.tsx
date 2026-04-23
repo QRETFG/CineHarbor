@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import MovieForm, { type MovieFormValues } from "../components/MovieForm";
-import type { Movie } from "../../types/catalog";
+import type { Movie, MovieSectionKey } from "../../types/catalog";
 
 interface AssetItem {
   id: number;
@@ -15,9 +15,10 @@ const emptyValues: MovieFormValues = {
   genre: "",
   description: "",
   url: "",
-  status: "draft",
+  status: "published",
   posterAssetId: "",
   backdropAssetId: "",
+  sections: ["popular"],
 };
 
 export default function MoviesPage() {
@@ -56,7 +57,10 @@ export default function MoviesPage() {
       backdropAssetId: values.backdropAssetId
         ? Number(values.backdropAssetId)
         : null,
-      sections: [],
+      sections: values.sections.map((sectionKey, sortOrder) => ({
+        sectionKey,
+        sortOrder,
+      })),
     };
 
     const targetUrl = editingMovie ? `/api/movies/${editingMovie.id}` : "/api/movies";
@@ -96,6 +100,7 @@ export default function MoviesPage() {
       status: movie.status ?? "draft",
       posterAssetId: movie.posterAssetId ? String(movie.posterAssetId) : "",
       backdropAssetId: movie.backdropAssetId ? String(movie.backdropAssetId) : "",
+      sections: (movie.sections as MovieSectionKey[] | undefined) ?? ["popular"],
     });
   }
 

@@ -12,7 +12,9 @@ export default function AssetUploadForm({
   onUploaded,
 }: AssetUploadFormProps) {
   const [file, setFile] = useState<File | null>(null);
+  const [inputKey, setInputKey] = useState(0);
   const [message, setMessage] = useState("");
+  const fileInputId = `${kind}-file`;
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -33,20 +35,29 @@ export default function AssetUploadForm({
     });
 
     if (!response.ok) {
-      setMessage("上传失败");
+      const error = (await response.json().catch(() => null)) as {
+        message?: string;
+      } | null;
+      setMessage(error?.message ?? "上传失败");
       return;
     }
 
     const asset = (await response.json()) as { publicUrl: string };
     setMessage(`上传成功：${asset.publicUrl}`);
     setFile(null);
+    setInputKey((value) => value + 1);
     onUploaded?.();
   }
 
   return (
     <form className="space-y-4 sketch-border bg-surface p-5 shadow-sketch" onSubmit={handleSubmit}>
       <h2 className="font-hand text-2xl font-bold">{label}</h2>
+      <label className="block space-y-2 font-body text-sm" htmlFor={fileInputId}>
+        <span className="block font-semibold">选择文件</span>
+      </label>
       <input
+        key={inputKey}
+        id={fileInputId}
         className="block w-full font-body"
         onChange={(event) => setFile(event.target.files?.[0] ?? null)}
         type="file"
