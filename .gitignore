@@ -1,0 +1,6 @@
+.tmp/
+.env
+.env.local
+dist/
+node_modules/
+server/storage/

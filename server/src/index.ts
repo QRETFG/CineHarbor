@@ -1,7 +1,9 @@
 import "dotenv/config";
 import { createApp } from "./app";
+import { bootstrapApp } from "./db/bootstrap";
 
-const port = Number(process.env.SERVER_PORT ?? 3001);
+const { config } = bootstrapApp();
+const port = config.port;
 const app = createApp();
 
 app.listen(port, () => {
