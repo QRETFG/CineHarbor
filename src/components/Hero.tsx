@@ -1,19 +1,32 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Star } from "lucide-react";
-import { featuredMovies } from "../data/movies";
+import type { Movie } from "../types/catalog";
 
-export default function Hero() {
+interface HeroProps {
+  movies: Movie[];
+}
+
+export default function Hero({ movies }: HeroProps) {
   const [current, setCurrent] = useState(0);
-  const movie = featuredMovies[current];
+  const movie = movies[current];
 
   const prev = () =>
-    setCurrent((c) => (c - 1 + featuredMovies.length) % featuredMovies.length);
-  const next = () =>
-    setCurrent((c) => (c + 1) % featuredMovies.length);
+    setCurrent((c) => (c - 1 + movies.length) % movies.length);
+  const next = () => setCurrent((c) => (c + 1) % movies.length);
+
+  if (!movie) {
+    return (
+      <section id="精选" className="max-w-6xl mx-auto px-4 mt-8 scroll-mt-20">
+        <div className="sketch-border bg-surface p-8 text-center font-body text-pencil/60 shadow-sketch">
+          正在加载精选影视...
+        </div>
+      </section>
+    );
+  }
 
   return (
-    <section id="精选" className="max-w-6xl mx-auto px-4 mt-8">
-      <div className="relative sketch-border bg-white shadow-sketch overflow-hidden">
+    <section id="精选" className="max-w-6xl mx-auto px-4 mt-8 scroll-mt-20">
+      <div className="relative sketch-border bg-surface shadow-sketch overflow-hidden">
         {/* 胶带装饰 */}
         <div className="tape tape-left" />
         <div className="tape tape-right" />
@@ -48,7 +61,7 @@ export default function Hero() {
 
             {/* 指示器 */}
             <div className="flex gap-2 mt-6">
-              {featuredMovies.map((_, i) => (
+              {movies.map((_, i) => (
                 <button
                   key={i}
                   onClick={() => setCurrent(i)}
@@ -64,13 +77,13 @@ export default function Hero() {
         {/* 左右切换 */}
         <button
           onClick={prev}
-          className="absolute left-2 top-1/2 -translate-y-1/2 p-1 sketch-border-thin bg-white hover:bg-sticky transition-colors"
+          className="absolute left-2 top-1/2 -translate-y-1/2 p-1 sketch-border-thin bg-surface hover:bg-sticky transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
         <button
           onClick={next}
-          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 sketch-border-thin bg-white hover:bg-sticky transition-colors"
+          className="absolute right-2 top-1/2 -translate-y-1/2 p-1 sketch-border-thin bg-surface hover:bg-sticky transition-colors"
         >
           <ChevronRight className="w-5 h-5" />
         </button>

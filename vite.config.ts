@@ -4,4 +4,11 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    allowedHosts: ["fc62-39-146-212-41.ngrok-free.app"],
+    proxy: {
+      "/api": "http://127.0.0.1:3001",
+      "/uploads": "http://127.0.0.1:3001",
+    },
+  },
 });

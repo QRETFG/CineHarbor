@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { ExternalLink, Tag } from "lucide-react";
-import { sharedWebsites } from "../data/movies";
+import { sharedWebsites } from "../data/siteContent";
 
 const ALL_TAG = "全部";
 const tagPriority = ["动漫", "影视", "网盘"];
@@ -59,7 +59,7 @@ export default function WebsiteTags() {
   );
 
   return (
-    <section id="标签" className="max-w-6xl mx-auto px-4 mt-12">
+    <section id="标签" className="max-w-6xl mx-auto px-4 mt-12 scroll-mt-20">
       <h2 className="font-hand text-2xl font-bold mb-6 flex items-center gap-2">
         <span className="inline-block w-8 h-0.5 bg-pencil" />
         免费资源
@@ -71,7 +71,9 @@ export default function WebsiteTags() {
             key={tag.name}
             onClick={() => setActiveTag(tag.name)}
             className={`px-4 py-2 font-body text-sm sketch-border-thin transition-colors ${
-              activeTag === tag.name ? "bg-sticky" : "bg-white hover:bg-sticky/60"
+              activeTag === tag.name
+                ? "bg-sticky"
+                : "bg-surface hover:bg-sticky/60"
             }`}
           >
             {tag.name}
@@ -87,7 +89,7 @@ export default function WebsiteTags() {
             href={site.url}
             target="_blank"
             rel="noreferrer"
-            className="sketch-card sketch-border bg-white p-4 shadow-sketch hover:bg-sticky/40 transition-colors"
+            className="sketch-card sketch-border bg-surface p-4 shadow-sketch hover:bg-sticky/40 transition-colors"
           >
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-hand text-xl font-bold">{site.title}</h3>
