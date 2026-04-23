@@ -87,7 +87,12 @@ export function createAssetsRouter({ rootDir }: AssetsRouterOptions = {}) {
   router.delete("/:id", (req, res) => {
     const deleted = deleteAsset({ rootDir, id: req.params.id });
 
-    if (!deleted) {
+    if (deleted === "in_use") {
+      res.status(409).json({ message: "Asset is still referenced by a movie" });
+      return;
+    }
+
+    if (deleted === "not_found") {
       res.status(404).json({ message: "Asset not found" });
       return;
     }

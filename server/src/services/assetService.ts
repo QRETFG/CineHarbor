@@ -1,6 +1,7 @@
 import { unlinkSync } from "node:fs";
 import { createConfig } from "../config";
 import { createDatabase } from "../db/connection";
+import { assetIsReferenced } from "./movieService";
 import type { AssetKind } from "./storageService";
 
 interface AssetContext {
@@ -99,6 +100,10 @@ export function deleteAsset({
   rootDir,
   id,
 }: AssetContext & { id: number | string }) {
+  if (assetIsReferenced({ rootDir, assetId: id })) {
+    return "in_use" as const;
+  }
+
   const db = createDatabase(createConfig({ rootDir }));
   const record = db
     .prepare("SELECT * FROM assets WHERE id = ?")
@@ -106,12 +111,12 @@ export function deleteAsset({
 
   if (!record) {
     db.close();
-    return false;
+    return "not_found" as const;
   }
 
   db.prepare("DELETE FROM assets WHERE id = ?").run(id);
   db.close();
   unlinkSync(record.storage_path);
 
-  return true;
+  return "deleted" as const;
 }
