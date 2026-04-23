@@ -5,6 +5,8 @@ export interface AppConfig {
   port: number;
   cookieSecret: string;
   sqlitePath: string;
+  clientDistPath: string;
+  clientIndexPath: string;
   uploadRoot: string;
   dataRoot: string;
   uploadDirs: {
@@ -28,6 +30,8 @@ export function createConfig(overrides: ConfigOverrides = {}): AppConfig {
     rootDir,
     port,
     cookieSecret: process.env.COOKIE_SECRET ?? "change-me",
+    clientDistPath: resolve(rootDir, "..", "dist"),
+    clientIndexPath: resolve(rootDir, "..", "dist", "index.html"),
     dataRoot,
     uploadRoot,
     sqlitePath: resolve(dataRoot, "cineharbor.sqlite"),

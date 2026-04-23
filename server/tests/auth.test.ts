@@ -15,6 +15,8 @@ beforeEach(() => {
 
 afterEach(() => {
   rmSync(rootDir, { recursive: true, force: true });
+  delete process.env.ADMIN_SEED_USERNAME;
+  delete process.env.ADMIN_SEED_PASSWORD;
 });
 
 test("login returns 204 and sets a session cookie", async () => {
@@ -32,4 +34,15 @@ test("protected admin route returns 401 without login", async () => {
   );
 
   expect(response.status).toBe(401);
+});
+
+test("bootstraps an admin from environment variables when configured", async () => {
+  process.env.ADMIN_SEED_USERNAME = "docker-admin";
+  process.env.ADMIN_SEED_PASSWORD = "docker-secret";
+
+  const response = await request(createApp({ rootDir }))
+    .post("/api/auth/login")
+    .send({ username: "docker-admin", password: "docker-secret" });
+
+  expect(response.status).toBe(204);
 });

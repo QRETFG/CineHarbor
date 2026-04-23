@@ -53,6 +53,17 @@ export function createAdmin({ rootDir, username, password }: AdminCredentials) {
   return { id: admin.id, username: admin.username };
 }
 
+export function seedAdminFromEnv({ rootDir }: AuthContext = {}) {
+  const username = process.env.ADMIN_SEED_USERNAME?.trim();
+  const password = process.env.ADMIN_SEED_PASSWORD?.trim();
+
+  if (!username || !password) {
+    return null;
+  }
+
+  return createAdmin({ rootDir, username, password });
+}
+
 export function verifyCredentials({
   rootDir,
   username,

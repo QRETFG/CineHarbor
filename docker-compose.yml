@@ -1,0 +1,12 @@
+services:
+  cineharbor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env.docker
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./server/storage:/app/server/storage
+    restart: unless-stopped

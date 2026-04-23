@@ -1,0 +1,10 @@
+.git
+.worktrees
+node_modules
+dist
+server/dist
+server/storage
+.tmp
+.env
+.env.local
+.env.docker

@@ -1,5 +1,6 @@
 .tmp/
 .env
+.env.docker
 .env.local
 dist/
 node_modules/
