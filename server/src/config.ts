@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 export interface AppConfig {
   rootDir: string;
   port: number;
+  cookieSecret: string;
   sqlitePath: string;
   uploadRoot: string;
   dataRoot: string;
@@ -26,6 +27,7 @@ export function createConfig(overrides: ConfigOverrides = {}): AppConfig {
   return {
     rootDir,
     port,
+    cookieSecret: process.env.COOKIE_SECRET ?? "change-me",
     dataRoot,
     uploadRoot,
     sqlitePath: resolve(dataRoot, "cineharbor.sqlite"),
